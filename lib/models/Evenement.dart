@@ -2,7 +2,7 @@ class Evenement{
 
   final String title;
   String? description;
-  final DateTime date;
+  final String date;
   final String location;
   final int capacity;
   final int register;
@@ -15,7 +15,7 @@ class Evenement{
         capacity: json['capacity'],
         date: json['date'],
         description: json['description'],
-        register: json['register']
+       register: json['inscriptions_count']
     );
   }
 }

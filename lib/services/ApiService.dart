@@ -6,14 +6,16 @@ import 'package:http/http.dart' as http;
 class ApiService{
 
 
-Future<Evenement> eventList() async {
+Future<List<Evenement>> eventList() async {
 
-  var url = Uri.https('127.0.0.1:8000', 'api/event');
-  var response = await http.post(url);
-  print('Response status: ${response.statusCode}');
-  print('Response body: ${response.body}');
-
-  return Evenement.fromJson(jsonDecode(response.body));
+  var url = Uri.http('192.168.11.102:8000','/api/events');
+  var response = await http.get(url);
+  final data =jsonDecode( response.body);
+  if (data is List) {
+    return data.map((item) => Evenement.fromJson(item)).toList();
+  } else {
+    throw Exception('Les données reçues ne sont pas une liste');
+  }
 
   }
 }
