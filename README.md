@@ -1,16 +1,19 @@
-# gestion_evement
+# Gestion évenement
 
-A new Flutter project.
+## Instalation du projet
+   - git clone https://github.com/pabal15522/gestion_evenment_flutter.git
+   - flutter pub get
+   - Configurer le gradle 
+   - Dans lib/config/Config.dart => apiUrl= IP du pc(ipconfig)
+   - lancer le projet depuis android Studio (emulateur virtuel ou téléphone physique)
 
-## Getting Started
+## Le choix des packages
+   Nous avons utilisé : 
+   - http pour recuperé les données dépuis l'API.
+   - intl pour formaté la date
+   - flutter_localizations (dépendence) pour la langue
 
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## Perspective 
+   - La gestion des états
+   - Structuré certains widget pour faciliter la maintenance
+   - Faire des retouches sur les différentes interfaces
