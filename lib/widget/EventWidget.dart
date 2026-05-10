@@ -15,12 +15,32 @@ class Eventwidget extends StatefulWidget {
 
 class _EventwidgetState extends State<Eventwidget> {
   final _apiService=ApiService();
+  String _searchText = '';
+  String _searchDate='';
+
+  @override
+  void initState() {
+    super.initState();
+   // _refreshProduits();
+  }
+  void _refreshEvents() {
+    setState(() {
+
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: Text("Gestion évènment"),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.search),
+            onPressed: () => _showSearchDialog(context),
+          ),
+        ],
       backgroundColor: Config.primaryColor,),
-      body: FutureBuilder<List<Evenement>>(future: _apiService.eventList(), builder: (context,snapshot){
+      body: FutureBuilder<List<Evenement>>(future: _apiService.eventList(_searchText,_searchDate), builder: (context,snapshot){
         if (snapshot.connectionState == ConnectionState.waiting) {
           return Center(
             child: Column(
@@ -153,4 +173,36 @@ class _EventwidgetState extends State<Eventwidget> {
       ),
     );
   }
+
+  void _showSearchDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('Rechercher un évènement',style: TextStyle(fontSize: 14),),
+        content: TextField(
+          autofocus: true,
+          decoration: InputDecoration(hintText: 'Nom de l\'évènement...'),
+          onChanged: (value) => setState(() => _searchText = value),
+        ),
+        actions: [
+          TextButton(
+            child: Text('Annuler'),
+            onPressed: () => Navigator.pop(context),
+          ),
+          TextButton(
+            child: Text('Rechercher'),
+            onPressed: () {
+              Navigator.pop(context);
+              _refreshEvents();
+            },
+          ),
+        ],
+      ),
+    );
+
+  }
 }
+
+
+
+
