@@ -90,7 +90,7 @@ class _RegisterwidgetState extends State<Registerwidget> {
 
               const SizedBox(height: 20),
 
-              // Formulaire
+              // Formulaire d'inscription
               _buildFormField(
                 controller:_lastNameController ,
                 label: 'Nom',

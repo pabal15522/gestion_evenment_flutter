@@ -18,15 +18,35 @@ class _EventwidgetState extends State<Eventwidget> {
   final _apiService=ApiService();
   String _searchText = '';
   String _searchDate='';
+  final _searchController = TextEditingController();
 
   @override
-  void initState() {
-    super.initState();
-   // _refreshProduits();
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
   }
-  void _refreshEvents() {
-    setState(() {
 
+  void _refreshEvents() => setState(() {});
+
+  Future<void> _pickDate() async {
+    final picked = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime(2020),
+      lastDate: DateTime(2030),
+    );
+    if (picked != null) {
+      setState(() {
+        _searchDate = DateFormat('yyyy-MM-dd').format(picked);
+      });
+    }
+  }
+
+  void _clearFilters() {
+    setState(() {
+      _searchText = '';
+      _searchDate = '';
+      _searchController.clear();
     });
   }
 
@@ -34,70 +54,165 @@ class _EventwidgetState extends State<Eventwidget> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: Text("Gestion évènment"),
-        actions: [
-          IconButton(
-            icon: Icon(Icons.search),
-            onPressed: () => _showSearchDialog(context),
-          ),
-        ],
       backgroundColor: Config.primaryColor,
       foregroundColor: Colors.white,),
       backgroundColor: Config.backGroundColor,
-      body: FutureBuilder<List<Evenement>>(future: _apiService.eventList(_searchText,_searchDate), builder: (context,snapshot){
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                SizedBox(height: MediaQuery.of(context).size.height*0.2,),
-                CircularProgressIndicator(
-                  backgroundColor: Colors.black,
-                  valueColor: AlwaysStoppedAnimation(Config.primaryColor),
-                ),
-              ],
-            ),
-          );
-        }
-        if (snapshot.hasError) {
-          return  Center(child:Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
+      body:Column(children: [
+        Container(
+          color: Config.primaryColor,
+          padding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
+          child: Column(
             children: [
-              SizedBox(
-                width: double.infinity,
-                height:278,
-                child: Icon(Icons.access_time_sharp,
-                  ),),
-              Padding(
-                padding: EdgeInsets.all(15.0),
-                child: Text("Connexion réseau indisponible. Veillez vérifier que vous disposer d'une connexion internet et réessayer. ${snapshot.error}",style: TextStyle(fontStyle: FontStyle.italic,fontSize: 16),textAlign: TextAlign.center,),
+              //  Champ recherche
+              TextField(
+                controller: _searchController,
+                onChanged: (value) => setState(() => _searchText = value),
+                onSubmitted: (_) => _refreshEvents(),
+                style: const TextStyle(color: Colors.white),
+                decoration: InputDecoration(
+                  hintText: 'Rechercher un évènement...',
+                  hintStyle: TextStyle(color: Colors.white.withOpacity(0.7)),
+                  prefixIcon: const Icon(Icons.search, color: Colors.white),
+                  suffixIcon: _searchText.isNotEmpty
+                      ? IconButton(
+                    icon: const Icon(Icons.clear, color: Colors.white),
+                    onPressed: () {
+                      setState(() {
+                        _searchText = '';
+                        _searchController.clear();
+                      });
+                    },
+                  )
+                      : null,
+                  filled: true,
+                  fillColor: Colors.white.withOpacity(0.2),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide.none,
+                  ),
+                  contentPadding: const EdgeInsets.symmetric(vertical: 0),
+                ),
+              ),
+              const SizedBox(height: 8),
+              // Filtre date en plus de netoyage
+              Row(
+                children: [
+                  Expanded(
+                    child: GestureDetector(
+                      onTap: _pickDate,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 12, vertical: 10),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.2),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: Row(
+                          children: [
+                            const Icon(Icons.calendar_today,
+                                color: Colors.white, size: 18),
+                            const SizedBox(width: 8),
+                            Text(
+                              _searchDate.isEmpty
+                                  ? 'Filtrer par date'
+                                  : _searchDate,
+                              style: TextStyle(
+                                color: Colors.white.withOpacity(
+                                    _searchDate.isEmpty ? 0.7 : 1.0),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                  // Bouton effacer filtres
+                  if (_searchText.isNotEmpty || _searchDate.isNotEmpty) ...[
+                    const SizedBox(width: 8),
+                    GestureDetector(
+                      onTap: _clearFilters,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 12, vertical: 10),
+                        decoration: BoxDecoration(
+                          color: Colors.red.withOpacity(0.8),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: const Row(
+                          children: [
+                            Icon(Icons.filter_alt_off,
+                                color: Colors.white, size: 18),
+                            SizedBox(width: 4),
+                            Text('Effacer',
+                                style: TextStyle(color: Colors.white)),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ]
+                ],
               ),
             ],
-          ));
-        }
-        if (!snapshot.hasData || snapshot.data!.isEmpty) {
-          return Center(child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              SizedBox(height: MediaQuery.of(context).size.height*0.2,),
-              Icon(Icons.calendar_today,size: 80,color: Config.primaryColor,),
-              const SizedBox(height: 10,),
-              const Text("Pas de d'évènement",style: TextStyle(fontStyle: FontStyle.italic,fontSize: 16),),
-            ],
-          ));
-        }
-
-        return SizedBox(
-          height: MediaQuery.of(context).size.height,
-          child: SingleChildScrollView(
-            scrollDirection: Axis.vertical,
-            child: Column(
-              children: snapshot.data!.map((planning) =>_buildCartItem(planning)).toList(),
-            ),
           ),
-        );
-      }),
+        ),
+        Expanded(
+          child: FutureBuilder<List<Evenement>>(
+            future: _apiService.eventList(_searchText, _searchDate),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return Center(
+                  child: CircularProgressIndicator(
+                    valueColor:
+                    AlwaysStoppedAnimation(Config.primaryColor),
+                  ),
+                );
+              }
+              if (snapshot.hasError) {
+                return Center(
+                  child: Padding(
+                    padding: const EdgeInsets.all(15.0),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Icon(Icons.wifi_off,
+                            size: 80, color: Colors.grey),
+                        const SizedBox(height: 10),
+                        Text(
+                          "Connexion réseau indisponible. Vérifiez votre connexion et réessayez.",
+                          style: const TextStyle(
+                              fontStyle: FontStyle.italic, fontSize: 16),
+                          textAlign: TextAlign.center,
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              }
+              if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                return Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.calendar_today,
+                          size: 80, color: Config.primaryColor),
+                      const SizedBox(height: 10),
+                      const Text("Aucun évènement trouvé",
+                          style: TextStyle(
+                              fontStyle: FontStyle.italic, fontSize: 16)),
+                    ],
+                  ),
+                );
+              }
+
+              return ListView.builder(
+                itemCount: snapshot.data!.length,
+                itemBuilder: (context, index) =>
+                    _buildCartItem(snapshot.data![index]),
+              );
+            },
+          ),
+        ),
+      ],)
     );
   }
   
@@ -144,8 +259,10 @@ class _EventwidgetState extends State<Eventwidget> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Column(crossAxisAlignment: CrossAxisAlignment.start,children: [
-                  Text("Lieu : ${event.location}"),
-                  Text("Date : ${DateFormat('yyyy-mm-dd').parse(event.date)}")
+                  const SizedBox(height: 12),
+                  _infoRow(Icons.calendar_today, DateFormat('yyyy-MM-dd').format(DateTime.parse(event.date))),
+                  const SizedBox(height: 8),
+                  _infoRow(Icons.location_on, event.location),
                 ],),
 
                 Column(children: [
@@ -186,32 +303,14 @@ class _EventwidgetState extends State<Eventwidget> {
     ));
   }
 
-  void _showSearchDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text('Rechercher un évènement',style: TextStyle(fontSize: 14),),
-        content: TextField(
-          autofocus: true,
-          decoration: InputDecoration(hintText: 'Nom de l\'évènement...'),
-          onChanged: (value) => setState(() => _searchText = value),
-        ),
-        actions: [
-          TextButton(
-            child: Text('Annuler'),
-            onPressed: () => Navigator.pop(context),
-          ),
-          TextButton(
-            child: Text('Rechercher'),
-            onPressed: () {
-              Navigator.pop(context);
-              _refreshEvents();
-            },
-          ),
-        ],
-      ),
+  Widget _infoRow(IconData icon, String text) {
+    return Row(
+      children: [
+        Icon(icon, size: 18, color: Config.primaryColor),
+        const SizedBox(width: 8),
+        Text(text, style: const TextStyle(fontSize: 14)),
+      ],
     );
-
   }
 }
 

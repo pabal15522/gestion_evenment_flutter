@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:gestion_evement/widget/EventWidget.dart';
-import 'package:intl/date_symbol_data_local.dart';
-
+import 'package:flutter_localizations/flutter_localizations.dart';
 Future<void> main() async {
-  await initializeDateFormatting('fr_FR', null);
   runApp(const MyApp());
 
 }
@@ -11,10 +9,18 @@ Future<void> main() async {
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      localizationsDelegates: const [
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: const [
+        Locale('fr', 'FR'),
+      ],
       debugShowCheckedModeBanner: false,
       title: 'Gestion évènement',
       theme: ThemeData(

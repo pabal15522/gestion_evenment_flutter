@@ -31,8 +31,9 @@ class _EventdetailwidgetState extends State<Eventdetailwidget> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Header card
+
             Card(
+              color: Colors.white,
               elevation: 3,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
               child: Padding(
@@ -40,6 +41,13 @@ class _EventdetailwidgetState extends State<Eventdetailwidget> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    Container(
+                        width: MediaQuery.of(context).size.width,
+                        height: 180,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10),
+                          image:DecorationImage(fit: BoxFit.fill,image: AssetImage("assets/images/evenement.jpg")),)),
+                    const SizedBox(height: 5),
                     Text(
                       event.title,
                       style: const TextStyle(
@@ -60,6 +68,7 @@ class _EventdetailwidgetState extends State<Eventdetailwidget> {
 
 
                 Card(
+                  color: Colors.white,
                   elevation: 3,
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                   child: Padding(
@@ -109,6 +118,7 @@ class _EventdetailwidgetState extends State<Eventdetailwidget> {
                 // Description
                 if (event.description != null && event.description!.isNotEmpty)
             Card(
+              color: Colors.white,
               elevation: 3,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
               child: SizedBox(
