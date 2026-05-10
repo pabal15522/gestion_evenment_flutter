@@ -1,6 +1,6 @@
 class Inscription{
   final String firstName;
-  final DateTime lastName;
+  final String lastName;
   final String email;
   Inscription({required this.firstName,required this.lastName,required this.email});
 

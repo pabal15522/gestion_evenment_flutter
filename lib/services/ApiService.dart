@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:gestion_evement/models/Evenement.dart';
+import 'package:gestion_evement/models/Inscription.dart';
 import 'package:http/http.dart' as http;
 
 import '../config/Config.dart';
@@ -36,17 +37,25 @@ Future<List<Evenement>> eventList(String? search,String? date) async {
     }
   }
 
-  Future<String> register(int eventId) async {
-    var url = Uri.http(Config.apiUrl,'/api/events/$eventId/register');
-    var response = await http.post(url);
-    if(response.statusCode==201){
-      return "Inscription effectuée avec succès";
-    }
-    if(response.statusCode==409){
-      return "Cette adresse email est déjà enregistrée pour cet évènement";
-    }
-    else {
-      throw Exception('Une erreur s\'est produite lors de l\'enregistrement');
-    }
+Future<Map<String, dynamic>> register(int eventId, Inscription inscription) async {
+  var url = Uri.http(Config.apiUrl, '/api/events/$eventId/register');
+  var response = await http.post(
+    url,
+    headers: {'Content-Type': 'application/json'},
+    body: jsonEncode({
+      'firstName': inscription.firstName,
+      'lastName': inscription.lastName,
+      'email': inscription.email,
+    }),
+  );
+  if (response.statusCode == 201) {
+    return {'success': true, 'message': "Inscription effectuée avec succès"};
+  } else if (response.statusCode == 409) {
+    return {'success': false, 'message': "Cette adresse email est déjà enregistrée pour cet évènement"};
+  } else if (response.statusCode == 400) {
+    return {'success': false, 'message': "Format d'email invalide"};
+  } else {
+    throw Exception('Une erreur s\'est produite lors de l\'enregistrement');
   }
+}
 }

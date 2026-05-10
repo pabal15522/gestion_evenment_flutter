@@ -5,6 +5,7 @@ import 'package:gestion_evement/services/ApiService.dart';
 import 'package:intl/intl.dart';
 
 import '../config/Config.dart';
+import 'EventDetailWidget.dart';
 
 class Eventwidget extends StatefulWidget {
   const Eventwidget({super.key});
@@ -39,7 +40,9 @@ class _EventwidgetState extends State<Eventwidget> {
             onPressed: () => _showSearchDialog(context),
           ),
         ],
-      backgroundColor: Config.primaryColor,),
+      backgroundColor: Config.primaryColor,
+      foregroundColor: Colors.white,),
+      backgroundColor: Config.backGroundColor,
       body: FutureBuilder<List<Evenement>>(future: _apiService.eventList(_searchText,_searchDate), builder: (context,snapshot){
         if (snapshot.connectionState == ConnectionState.waiting) {
           return Center(
@@ -99,7 +102,16 @@ class _EventwidgetState extends State<Eventwidget> {
   }
   
   Widget _buildCartItem(Evenement event) {
-    return Container(
+    return GestureDetector(
+        onTap: () {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => Eventdetailwidget(event: event),
+        ),
+      );
+    },
+    child: Container(
       margin: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
       padding: const EdgeInsets.all(15),
       width: MediaQuery.of(context).size.width,
@@ -171,7 +183,7 @@ class _EventwidgetState extends State<Eventwidget> {
           )
         ],
       ),
-    );
+    ));
   }
 
   void _showSearchDialog(BuildContext context) {
